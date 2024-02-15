@@ -6,7 +6,12 @@ function userPrompt() {
 
 function checkForMatch() {
     # for arch anyway ... refactor later if needed
-    [ -z "${checkRepo}" ] && echo "${package} found" || echo "${package} not found"
+    # reminder: -z is "is length of string zero?"  returns true if it IS zero
+
+
+    # NOT SURE how i did this but in the checkRepo var there is a "not found" check
+    #  ... if that IS present (non zero length string, the package is not found)
+    [ -z "${checkRepo}" ] && echo "${package} found" && package_exists="true" || echo "${package} not found" || package_exists="false"
 }
 
 
@@ -19,12 +24,25 @@ function checkArchRepo() {
     #packageURL="https://www.archlinux.org/packages/${package}"
     packageURL="https://archlinux.org/packages/?q=${package}"
     checkRepo=$(curl -sL "${packageURL}" | grep "No matching packages found" )
-    #echo -e "This should only display something if NO matches are found;\t ${checkRepo}"
-    checkForMatch
     
+    #only checks to see if its found 
+    checkForMatch
+
+    case $package_exists in 
+        false) echo "Package doesn't exist, nothing to do or report";;
+
+        true) 
+                #echo -e "debugging: packageURL:\t${packageURL}"
+
+                package_version=$(curl -Ls ${packageURL} | grep -m1 -E "<td>[0-9]*\." | sed 's/<td>//;s/<.td>//' | tr -d \[:blank:] )
+                echo -e "Arch version for ${package} is: ${package_version}" 
+            ;;
+
+    esac 
+
     # AUR
-    packageURL="https://aur.archlinux.org/packages/?O=0&K=${package}"
-    checkRepo=$(curl -Ls "${packageURL}" | echo "checks here" )
+#     packageURL="https://aur.archlinux.org/packages/?O=0&K=${package}"
+#     checkRepo=$(curl -Ls "${packageURL}" | echo "checks here" )
 }
 
 function checkUbuntuRepos() {
@@ -67,7 +85,7 @@ function metaCheckRepos() {
     clear
     echo -e "Checking Arch, Debian, Fedora, OpenSUSE, and Ubuntu repos for ${package}"
 
-    #checkArchRepo
+    checkArchRepo
 
     # distro="Debian"
     # packageURL="https://packages.debian.org/search?keywords=${package}&searchon=names&suite=stable&section=all"
@@ -82,10 +100,10 @@ function metaCheckRepos() {
     # packageURL="https://software.opensuse.org/package/${package}"
     # checkMultiDistros
 
-    checkUbuntuRepos ${package}
+    #checkUbuntuRepos ${package}
 
 }
 
 #metaCheckRepos "shunar"
-metaCheckRepos "hexchat"
+metaCheckRepos "smplayer"
 #metaCheckRepos "libgtk-4"
