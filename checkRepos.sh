@@ -3,8 +3,13 @@
 # check status of last command ... if successful that means there is a match 
 function userPrompt() {
   read -r -p "Press [Enter] to continue"
-  clear 
+  #clear 
 }
+
+function clear_vars() {
+    unset "${package}" "${package_url}" "${aur_check}" "${aur_version}" 
+}
+
 
 function checkForMatch() {
     # for arch anyway ... refactor later if needed
@@ -14,7 +19,7 @@ function checkForMatch() {
     #  ... if that IS present (non zero length string, the package is not found)
 
     ## thought: do i really need/want an echo here? was that for debugging?
-    [ -z "${checkRepo}" ] && echo "${package} found" && package_exists="true" || echo "${package} not found" || package_exists="false"
+    [ -z "${checkRepo}" ] && package_exists="true" || package_exists="false"
 }
 
 function checkAUR() {
@@ -25,11 +30,9 @@ function checkAUR() {
     
     [[ ${aur_check} = *"404 - Page Not Found"* ]] && echo -e "Package ${package} not found in AUR" && userPrompt && return || aur_version=$(curl -Ls "${packageURL}" | awk '/Package Details/ { print $4}' | cut -d "<" -f1 ) && echo -e "${package} version in the AUR is ${aur_version}" 
 
-    unset "${aur_check}" "${aur_version}" && userPrompt
+    clear_vars && userPrompt
 
 }
-
-
 
 # check Repos for package
 function checkArchRepo() {
@@ -45,7 +48,7 @@ function checkArchRepo() {
     checkForMatch
 
     case $package_exists in 
-        false) echo "Package doesn't exist, nothing to do or report" ;;
+        false) echo "Package ${package} doesn't exist in the default Arch repos" ;;
 
         true) 
             package_version=$(curl -Ls ${packageURL} | grep -m1 -E "<td>[0-9]*\." | sed 's/<td>//;s/<.td>//' | tr -d \[:blank:] )
@@ -65,24 +68,26 @@ function metaCheckArch() {
 }
 
 function checkUbuntuRepos() {
-
+    clear 
     echo -e "Checking Ubuntu for ${package}"
     # work with different branches here I may have to use different URLs here that have each branch in the name
-    #packageURL="https://packages.ubuntu.com/search?keywords=${1}&searchon=names&suite=disco&section=all"
+    packageURL="https://packages.ubuntu.com/search?keywords=${package}&searchon=names&suite=disco&section=all"
 
-    #checkRepo=$(curl -Ls "${packageURL}")
+    checkRepo=$(curl -Ls "${packageURL}")
 
     # ?? i think i may need SPECIFIC links for say each branch? 
     focal_url="https://packages.ubuntu.com/focal/${package}"
-    focalResult=$(curl -Ls "${focal_url}" | awk '/Package:/ {print $3}' | sed 's/(//;s/)//')
-    echo -e "Focal result for ${package}:\t${focalResult}"
+    focal_result=$(curl -Ls "${focal_url}" | awk '/Package:/ {print $3}' | sed 's/(//;s/)//')
+
+
+    [ -z "$focal_result" ] && echo -e "${package} not found in Ubuntu focal repo" || echo -e "Focal result for ${package}:\t${focalResult}"
 
     jammy_url="https://packages.ubuntu.com/jammy/${package}"
     jammy_result=$(curl -Ls "${jammy_url}" | awk '/Package:/ {print $3}' | sed 's/(//;s/)//')
-    echo -e "Jammy result for ${package}:\t${jammy_result}"
 
-    # debug
-    echo -e "${checkRepo}"
+    [ -z "$jammy_result" ] && echo -e "${package} not found in Ubuntu jammy repo" || echo -e "Jammy result for ${package}:\t${jammy_result}"
+
+    userPrompt
 }
 
 # For Debian, Fedora, and OpenSUSE
@@ -119,7 +124,7 @@ function metaCheckRepos() {
     # packageURL="https://software.opensuse.org/package/${package}"
     # checkMultiDistros
 
-    #checkUbuntuRepos ${package}
+    checkUbuntuRepos ${package}
 
 }
 
