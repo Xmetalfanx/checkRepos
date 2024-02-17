@@ -22,27 +22,33 @@ function checkArchRepo() {
 
     # pacman
     #packageURL="https://www.archlinux.org/packages/${package}"
-    packageURL="https://archlinux.org/packages/?q=${package}"
-    checkRepo=$(curl -sL "${packageURL}" | grep "No matching packages found" )
+    #packageURL="https://archlinux.org/packages/?q=${package}"
+    #checkRepo=$(curl -sL "${packageURL}" | grep "No matching packages found" )
     
     #only checks to see if its found 
-    checkForMatch
+    #checkForMatch
 
-    case $package_exists in 
-        false) echo "Package doesn't exist, nothing to do or report";;
+    # case $package_exists in 
+    #     false) echo "Package doesn't exist, nothing to do or report";;
 
-        true) 
-                #echo -e "debugging: packageURL:\t${packageURL}"
+    #     true) 
+    #             #echo -e "debugging: packageURL:\t${packageURL}"
 
-                package_version=$(curl -Ls ${packageURL} | grep -m1 -E "<td>[0-9]*\." | sed 's/<td>//;s/<.td>//' | tr -d \[:blank:] )
-                echo -e "Arch version for ${package} is: ${package_version}" 
-            ;;
+    #             package_version=$(curl -Ls ${packageURL} | grep -m1 -E "<td>[0-9]*\." | sed 's/<td>//;s/<.td>//' | tr -d \[:blank:] )
+    #             echo -e "Arch version for ${package} is: ${package_version}" 
+    #         ;;
 
-    esac 
+    # esac 
 
     # AUR
-#     packageURL="https://aur.archlinux.org/packages/?O=0&K=${package}"
-#     checkRepo=$(curl -Ls "${packageURL}" | echo "checks here" )
+    # idea: aur should be exact package match 
+    packageURL="https://aur.archlinux.org/packages/${package}"
+    aur_check=$(curl -Ls "${packageURL}" )
+    
+    [[ ${aur_check} = *"404 - Page Not Found"* ]] && echo -e "Package ${package} not found in AUR" && userPrompt && return || aur_version=$(curl -Ls "${packageURL}" | awk '/Package Details/ { print $4}' | cut -d "<" -f1 ) && echo -e "${package} version in the AUR is ${aur_version}" 
+
+
+    unset "${aur_check}" "${aur_version}" && userPrompt
 }
 
 function checkUbuntuRepos() {
@@ -105,5 +111,7 @@ function metaCheckRepos() {
 }
 
 #metaCheckRepos "shunar"
-metaCheckRepos "smplayer"
+metaCheckRepos "librewolf"
+# test to check aur with
+metaCheckRepos "foowolf"
 #metaCheckRepos "libgtk-4"
