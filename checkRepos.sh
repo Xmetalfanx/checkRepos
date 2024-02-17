@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # check status of last command ... if successful that means there is a match 
 function userPrompt() {
   read -r -p "Press [Enter] to continue"
@@ -8,11 +10,25 @@ function checkForMatch() {
     # for arch anyway ... refactor later if needed
     # reminder: -z is "is length of string zero?"  returns true if it IS zero
 
-
     # NOT SURE how i did this but in the checkRepo var there is a "not found" check
     #  ... if that IS present (non zero length string, the package is not found)
+
+    ## thought: do i really need/want an echo here? was that for debugging?
     [ -z "${checkRepo}" ] && echo "${package} found" && package_exists="true" || echo "${package} not found" || package_exists="false"
 }
+
+function checkAUR() {
+    # AUR
+    # idea: aur should be exact package match 
+    packageURL="https://aur.archlinux.org/packages/${package}"
+    aur_check=$(curl -Ls "${packageURL}" )
+    
+    [[ ${aur_check} = *"404 - Page Not Found"* ]] && echo -e "Package ${package} not found in AUR" && userPrompt && return || aur_version=$(curl -Ls "${packageURL}" | awk '/Package Details/ { print $4}' | cut -d "<" -f1 ) && echo -e "${package} version in the AUR is ${aur_version}" 
+
+    unset "${aur_check}" "${aur_version}" && userPrompt
+
+}
+
 
 
 # check Repos for package
@@ -22,33 +38,30 @@ function checkArchRepo() {
 
     # pacman
     #packageURL="https://www.archlinux.org/packages/${package}"
-    #packageURL="https://archlinux.org/packages/?q=${package}"
-    #checkRepo=$(curl -sL "${packageURL}" | grep "No matching packages found" )
+    packageURL="https://archlinux.org/packages/?q=${package}"
+    checkRepo=$(curl -sL "${packageURL}" | grep "No matching packages found" )
     
     #only checks to see if its found 
-    #checkForMatch
+    checkForMatch
 
-    # case $package_exists in 
-    #     false) echo "Package doesn't exist, nothing to do or report";;
+    case $package_exists in 
+        false) echo "Package doesn't exist, nothing to do or report" ;;
 
-    #     true) 
-    #             #echo -e "debugging: packageURL:\t${packageURL}"
+        true) 
+            package_version=$(curl -Ls ${packageURL} | grep -m1 -E "<td>[0-9]*\." | sed 's/<td>//;s/<.td>//' | tr -d \[:blank:] )
+            echo -e "Arch version for ${package} is: ${package_version}" 
+            ;;
 
-    #             package_version=$(curl -Ls ${packageURL} | grep -m1 -E "<td>[0-9]*\." | sed 's/<td>//;s/<.td>//' | tr -d \[:blank:] )
-    #             echo -e "Arch version for ${package} is: ${package_version}" 
-    #         ;;
+    esac 
 
-    # esac 
+    userPrompt
 
-    # AUR
-    # idea: aur should be exact package match 
-    packageURL="https://aur.archlinux.org/packages/${package}"
-    aur_check=$(curl -Ls "${packageURL}" )
-    
-    [[ ${aur_check} = *"404 - Page Not Found"* ]] && echo -e "Package ${package} not found in AUR" && userPrompt && return || aur_version=$(curl -Ls "${packageURL}" | awk '/Package Details/ { print $4}' | cut -d "<" -f1 ) && echo -e "${package} version in the AUR is ${aur_version}" 
+}
 
+function metaCheckArch() {
+    checkArchRepo
 
-    unset "${aur_check}" "${aur_version}" && userPrompt
+    checkAUR
 }
 
 function checkUbuntuRepos() {
@@ -61,11 +74,11 @@ function checkUbuntuRepos() {
 
     # ?? i think i may need SPECIFIC links for say each branch? 
     focal_url="https://packages.ubuntu.com/focal/${package}"
-    focalResult=$(curl -Ls $focal_url | awk '/Package:/ {print $3}' | sed 's/(//;s/)//')
+    focalResult=$(curl -Ls "${focal_url}" | awk '/Package:/ {print $3}' | sed 's/(//;s/)//')
     echo -e "Focal result for ${package}:\t${focalResult}"
 
     jammy_url="https://packages.ubuntu.com/jammy/${package}"
-    jammy_result=$(curl -Ls $jammy_url | awk '/Package:/ {print $3}' | sed 's/(//;s/)//')
+    jammy_result=$(curl -Ls "${jammy_url}" | awk '/Package:/ {print $3}' | sed 's/(//;s/)//')
     echo -e "Jammy result for ${package}:\t${jammy_result}"
 
     # debug
@@ -91,7 +104,7 @@ function metaCheckRepos() {
     clear
     echo -e "Checking Arch, Debian, Fedora, OpenSUSE, and Ubuntu repos for ${package}"
 
-    checkArchRepo
+    metaCheckArch
 
     # distro="Debian"
     # packageURL="https://packages.debian.org/search?keywords=${package}&searchon=names&suite=stable&section=all"
