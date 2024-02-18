@@ -1,19 +1,11 @@
 #!/bin/bash
 . configs/common.cfg
 . configs/archrelated.cfg
+. configs/debianrelated.cfg
 . configs/multidistro.cfg
 . configs/ubunturelated.cfg
 
-
-# For Debian, Fedora, and OpenSUSE
-function checkMultiDistros() {
-    echo -e "Checking ${distro} for ${package}"
-
-    # how do i check using the package URL ... like in each distro's search do i search the webpage for "file not found"?
-
-        # fedora may say "No results found!" or have "did you mean ..."
-
-}
+userPrompt 
 
 # Meta function
 # I need to make sure i look for exact names in my search, I think 
@@ -24,7 +16,10 @@ function metaCheckRepos() {
     clear
     echo -e "Checking Arch, Debian, Fedora, OpenSUSE, and Ubuntu repos for ${package}"
 
-    metaCheckArch
+    #metaCheckArch
+
+    metaDebianCheck ${package}
+
 
     # distro="Debian"
     # packageURL="https://packages.debian.org/search?keywords=${package}&searchon=names&suite=stable&section=all"
@@ -39,12 +34,14 @@ function metaCheckRepos() {
     # packageURL="https://software.opensuse.org/package/${package}"
     # checkMultiDistros
 
-    checkUbuntuRepos ${package}
+    #checkUbuntuRepos ${package}
 
 }
 
-#metaCheckRepos "shunar"
-metaCheckRepos "librewolf"
-# test to check aur with
+metaCheckRepos "firefox-esr"
+
+# known "false" for test 
 metaCheckRepos "foowolf"
+
+
 #metaCheckRepos "libgtk-4"
