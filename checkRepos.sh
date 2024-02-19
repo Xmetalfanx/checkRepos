@@ -2,10 +2,10 @@
 . configs/common.cfg
 . configs/archrelated.cfg
 . configs/debianrelated.cfg
+. configs/fedorarelated.cfg
 . configs/multidistro.cfg
 . configs/ubunturelated.cfg
 
-userPrompt 
 
 # Meta function
 # I need to make sure i look for exact names in my search, I think 
@@ -18,16 +18,9 @@ function metaCheckRepos() {
 
     #metaCheckArch
 
-    metaDebianCheck ${package}
+    #metaDebianCheck ${package}
 
-
-    # distro="Debian"
-    # packageURL="https://packages.debian.org/search?keywords=${package}&searchon=names&suite=stable&section=all"
-    # checkMultiDistros
-
-    # distro="Fedora"
-    # packageURL="https://packages.fedoraproject.org/search?query=${package}"
-    # checkMultiDistros ${distro} ${packageURL}
+    get_fedora_info "${package}"
 
     # distro="OpenSUSE"
     # # do different openSUSE Branches
@@ -38,10 +31,10 @@ function metaCheckRepos() {
 
 }
 
-metaCheckRepos "firefox-esr"
+metaCheckRepos "zsh"
 
 # known "false" for test 
-metaCheckRepos "foowolf"
+ metaCheckRepos "foowolf"
 
 
 #metaCheckRepos "libgtk-4"
