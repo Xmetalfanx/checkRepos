@@ -8,7 +8,7 @@
 
 
 # Meta function
-# I need to make sure i look for exact names in my search, I think 
+# I need to make sure i look for exact names in my search, I think
 function metaCheckRepos() {
 
     package=${1}
@@ -17,27 +17,26 @@ function metaCheckRepos() {
     echo -e "Checking Arch, Debian, Fedora, OpenSUSE, and Ubuntu repos for ${package}"
 
     # Arch
-    #metaCheckArch
+    checkArchRepo "${package}"
 
-    # Debian 
-    #metaDebianCheck ${package}
+    # Debian
+    checkDebianRepos "${package}"
 
-    # Fedora 
-    #get_fedora_info "${package}"
+    # Fedora
+    checkFedoraRepos "${package}"
 
-    # OpenSUSE 
-    get_openSUSE_repo_urls "leap155" "${package}"
-    get_openSUSE_repo_urls "tumbleweed" "${package}"
+    # OpenSUSE
+    checkOpenSUSERepos "leap155" "${package}"
+    checkOpenSUSERepos "tumbleweed" "${package}"
 
     # Ubuntu
-    #checkUbuntuRepos ${package}
+    checkUbuntuRepos ${package}
 
 }
 
 metaCheckRepos "hexchat"
 
-# known "false" for test 
-#metaCheckRepos "foowolf"
+#metaCheckRepos "firefox"
 
 
 #metaCheckRepos "libgtk-4"
