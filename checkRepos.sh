@@ -6,10 +6,12 @@
 . configs/opensuserelated.cfg
 . configs/ubunturelated.cfg
 
+# for debugging
+#userPrompt
 
 # Meta function
 # I need to make sure i look for exact names in my search, I think
-function metaCheckRepos() {
+function meta_check_repos() {
 
     package=${1}
 
@@ -17,26 +19,31 @@ function metaCheckRepos() {
     echo -e "Checking Arch, Debian, Fedora, OpenSUSE, and Ubuntu repos for ${package}"
 
     # Arch
-    checkArchRepo "${package}"
+    check_arch_repo "${package}"
 
     # Debian
-    checkDebianRepos "${package}"
+    check_debian_repos "${package}"
 
     # Fedora
-    checkFedoraRepos "${package}"
+    check_fedora_repo "${package}"
 
     # OpenSUSE
-    checkOpenSUSERepos "leap155" "${package}"
-    checkOpenSUSERepos "tumbleweed" "${package}"
+    check_openSUSE_repo "15.5" "${package}"
+    check_openSUSE_repo "15.6" "${package}"
+    check_openSUSE_repo "tumbleweed" "${package}"
 
     # Ubuntu
-    checkUbuntuRepos ${package}
+    check_ubuntu_repos ${package}
 
 }
 
-metaCheckRepos "hexchat"
+meta_check_repos "hexchat"
+#meta_check_repos "MozillaFirefox"
 
-#metaCheckRepos "firefox"
+
+#meta_check_repos "firefox"
+
+#meta_check_repos "curl"
 
 
-#metaCheckRepos "libgtk-4"
+#meta_check_repos "libgtk-4"
