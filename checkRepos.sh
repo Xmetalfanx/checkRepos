@@ -7,7 +7,7 @@
 . configs/ubunturelated.cfg
 
 # for debugging
-#userPrompt
+#user_prompt
 
 # Meta function
 # I need to make sure i look for exact names in my search, I think
