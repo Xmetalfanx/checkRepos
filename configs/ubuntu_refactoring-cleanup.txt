@@ -1,0 +1,51 @@
+# placeholder and REMOVABLE if the refactor works, function that is a place to cleanup the function i used to use, WITHOUT removing the code YET
+
+function check_ubuntu_repos_old_way() {
+
+ ########################################################################################
+    # Jammy - 22.04
+    ubuntu_branch="jammy"
+    jammy_url=$(assign_ubuntu_url "${ubuntu_branch}" )
+    jammy_result=$(assign_ubuntu_results "${jammy_url}" )
+
+    display_ubuntu_results
+
+    # [ -z "$jammy_result" ] && echo -e "${package} not found in Ubuntu jammy repo" || echo -e "Jammy result for ${package}:\t${jammy_result}"
+
+    #######################################################################################
+       ########################################################################################
+    # Jammy - 24.04
+    ubuntu_branch="noble"
+    noble_url=$(assign_ubuntu_url "${ubuntu_branch}" )
+    noble_result=$(assign_ubuntu_results "${noble_url}" )
+
+    display_ubuntu_results
+
+    # [ -z "$jammy_result" ] && echo -e "${package} not found in Ubuntu jammy repo" || echo -e "Jammy result for ${package}:\t${jammy_result}"
+
+    #######################################################################################
+       ########################################################################################
+    # Jammy - 26.04
+    ubuntu_branch="resolute"
+    resolute_url=$(assign_ubuntu_url "${ubuntu_branch}" )
+    resolute_result=$(assign_ubuntu_results "${resolute_url}" )
+
+    display_ubuntu_results
+
+    # [ -z "$jammy_result" ] && echo -e "${package} not found in Ubuntu jammy repo" || echo -e "Jammy result for ${package}:\t${jammy_result}"
+
+    #######################################################################################
+       ########################################################################################
+    # Jammy - 26.10
+    ubuntu_branch="stonking"
+    stonking_url=$(assign_ubuntu_url "${ubuntu_branch}" )
+    stonking_result=$(assign_ubuntu_results "${stonking_url}" )
+
+    display_ubuntu_results
+
+    # [ -z "$jammy_result" ] && echo -e "${package} not found in Ubuntu jammy repo" || echo -e "Jammy result for ${package}:\t${jammy_result}"
+
+    #######################################################################################
+
+
+}
