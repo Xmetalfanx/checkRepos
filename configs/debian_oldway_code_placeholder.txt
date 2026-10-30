@@ -1,0 +1,50 @@
+function debianSetVars_POSSIBLY_LIKELY_UN-NEEDED() {
+    # "check" var is the entire page curl'ed ... the result var is meant to display the version (the POINT) if the package is found
+
+    # Oct 2026 - Debian 12 - oldstable (still supported)
+    # bookworm_url=https://packages.debian.org/bookworm/${package} && bookworm_check=$(curl -Ls "${bookworm_url}" )
+    # bookworm_version=$(curl -Ls "${bookworm_url}" | awk '/Package:/ { print $3 }' | sed 's/[()]//g' )
+
+
+    get_debian_variables "bookworm"
+
+
+    # Oct 2026: Testing - Debian 13 - trixie
+    get_debian_variables "trixie"
+
+
+    # Oct 2026: Debian 14 Forky -- it appears (note this for other git repos i do, "Forky" is NOT sid/unstable)
+    get_debian_variables "forky"
+
+
+}
+
+
+# function check_package_in_repo_oldway() {
+#    echo "Checking if ${package} is in Debian Repos"
+
+
+#     [[ "${buster_check}" = *"No such package"* ]] && buster_package_exists="false" && echo -e "package ${package} does not exist in the Debian Buster repo" || buster_package_exists="true"
+
+#     [[ "${bullseye_check}" = *"No such package"* ]] && bullseye_package_exists="false" && echo -e "package ${package} does not exist in the Debian Bullseye repo" || bullseye_package_exists="true"
+
+#     [[ "${bookworm_check}" = *"No such package"* ]] && bookworm_package_exists="false" && echo -e "package ${package} does not exist in the Debian Bookworm repo" || bookworm_package_exists="true"
+
+#     [ "${buster_package_exists}" == "true" ] || [ "${bullseye_package_exists}" == "true" ] || [ "${bookworm_package_exist}" == "true" ] && displayDebianBranchInfo
+
+# }
+
+function checkDebianBranches() {
+    echo -e "Checking ${package} against Debian Branches" && user_prompt
+
+    check_package_in_repo
+
+    # if not found this will still show BUT i think i put this here to stop the "if the package does exist" result from looping 3 times (due to 3 debian branches)
+
+    if [ "${buster_check}" == "true" ] || [ "${bullseye_check}" == "true" ] || [ "${bookworm_check}" == "true" ]; then
+        displayDebianBranchInfo
+    fi
+
+    user_prompt
+
+}
